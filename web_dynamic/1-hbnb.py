@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Starts a Flash Web Application """
 from models import storage
+import uuid
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
@@ -10,7 +11,7 @@ from flask import Flask, render_template
 app = Flask(__name__)
 # app.jinja_env.trim_blocks = True
 # app.jinja_env.lstrip_blocks = True
-cache_id = "0bbd48bf-136f-4713-b126-b873cdc35629"
+cache_id = str(uuid.uuid4())
 
 
 @app.teardown_appcontext
