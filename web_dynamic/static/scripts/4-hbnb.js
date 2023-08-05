@@ -1,33 +1,29 @@
 $(document).ready(() => {
-  const amenity_ids = [];
-  const amenity_names = [];
+  const amenities = {};
 
   $('.popover ul input').on('change', (e) => {
-    setChecked(e.target.checked, e.target.dataset, amenity_ids, amenity_names);
-    $('.amenities h4').text(amenity_names.join(', '));
+    setChecked(e.target.checked, e.target.dataset, amenities);
+    $('.amenities h4').text(Object.keys(amenities).join(', '));
   });
 
-  const setChecked = (checked, value = {}, idArray = [], namesArray = []) => {
+  const setChecked = (checked, value = {}, amenityArray = {}) => {
     if (checked) {
-      addItem(idArray, namesArray, value);
+      addItem(amenityArray, value);
     } else {
-      removeItem(idArray, namesArray, value);
+      removeItem(amenityArray, value);
     }
   };
 
-  const removeItem = (idArray = [], namesArray = [], value = {}) => {
-    const index = idArray.indexOf(value.id);
-    if (index !== -1) {
-      idArray.splice(index, 1);
-      namesArray.splice(index, 1);
+  const removeItem = (amenityArray = {}, value = {}) => {
+    if (amenityArray[value.name]) {
+      delete amenityArray[value.name];
     } else {
       throw new Error('Id not in list');
     }
   };
 
-  const addItem = (idArray = [], namesArray = [], value = {}) => {
-    idArray.push(value.id);
-    namesArray.push(value.name);
+  const addItem = (amenityArray = {}, value = {}) => {
+    amenityArray[value.name] = value.id;
   };
 
   /* get api status */
@@ -44,6 +40,7 @@ $(document).ready(() => {
   const placeXMLcallBack = (data) => {
     $('section.places').html(
       data.map((place) => {
+        console.log(place);
         return ` 
     <article>
       <div class="title_box">
@@ -65,10 +62,6 @@ $(document).ready(() => {
         }
         </div>
       </div>
-      ${
-        place?.user?.first_name &&
-        `<div class='user'> <b>Owner:</b>${place?.user?.first_name} ${place?.user?.last_name}</div>`
-      } 
       <div class="description">${place.description}</div>
     </article>
     `;
@@ -88,7 +81,7 @@ $(document).ready(() => {
 
   /* get places according to amenities id */
   $('section.filters button').on('click', () => {
-    const obj = { amenities: amenity_ids };
+    const obj = { amenities: Object.values(amenities) };
     $.ajax({
       url: 'http://0.0.0.0:5001/api/v1/places_search/',
       type: 'POST',
