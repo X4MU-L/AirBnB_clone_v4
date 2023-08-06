@@ -159,7 +159,7 @@ $(document).ready(() => {
     }
   }
 
-  // Event listener for the click event on the "show/hide" span
+  // The event listener that listens to the click event on the "show/hide" span
   toggleReviewsBtn.on('click', toggleReviews);
 
   
