@@ -1,11 +1,22 @@
 $(document).ready(() => {
   const amenities = {};
+  const states = {};
+  const cities = {};
 
-  $('.popover ul input').on('change', (e) => {
+  $('.amenities .popover ul input').on('change', (e) => {
     setChecked(e.target.checked, e.target.dataset, amenities);
     $('.amenities h4').text(Object.keys(amenities).join(', '));
   });
 
+  $('.locations .popover ul input.state').on('change', (e) => {
+    setChecked(e.target.checked, e.target.dataset, states);
+    $('.locations h4').text(concatStates(states, cities));
+  });
+
+  $('.locations .popover ul input.city').on('change', (e) => {
+    setChecked(e.target.checked, e.target.dataset, cities);
+    $('.locations h4').text(concatStates(states, cities));
+  });
   const setChecked = (checked, value = {}, amenityArray = {}) => {
     if (checked) {
       addItem(amenityArray, value);
@@ -26,6 +37,11 @@ $(document).ready(() => {
     amenityArray[value.name] = value.id;
   };
 
+  const concatStates = (states = {}, cities = {}) => {
+    const allData = Object.keys(states).concat(Object.keys(cities));
+    return allData.join(', ');
+  };
+
   /* get api status */
   try {
     $.get('http://0.0.0.0:5001/api/v1/status/', (data) => {
@@ -40,7 +56,6 @@ $(document).ready(() => {
   const placeXMLcallBack = (data) => {
     $('section.places').html(
       data.map((place) => {
-        console.log(place);
         return ` 
     <article>
       <div class="title_box">
@@ -79,9 +94,21 @@ $(document).ready(() => {
     success: placeXMLcallBack,
   });
 
+  const setQueryObj = (obj = {}) => {
+    if (Object.values(amenities).length) {
+      obj['amenities'] = Object.values(amenities);
+    }
+    if (Object.values(cities).length) {
+      obj['cities'] = Object.values(cities);
+    }
+    if (Object.values(states).length) {
+      obj['states'] = Object.values(states);
+    }
+  };
   /* get places according to amenities id */
   $('section.filters button').on('click', () => {
-    const obj = { amenities: Object.values(amenities) };
+    const obj = {};
+    setQueryObj(obj);
     $.ajax({
       url: 'http://0.0.0.0:5001/api/v1/places_search/',
       type: 'POST',

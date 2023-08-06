@@ -1,11 +1,22 @@
 $(document).ready(() => {
   const amenities = {};
+  const states = {};
+  const cities = {};
 
-  $('.popover ul input').on('change', (e) => {
+  $('.amenities .popover ul input').on('change', (e) => {
     setChecked(e.target.checked, e.target.dataset, amenities);
     $('.amenities h4').text(Object.keys(amenities).join(', '));
   });
 
+  $('.locations .popover ul input.state').on('change', (e) => {
+    setChecked(e.target.checked, e.target.dataset, states);
+    $('.locations h4').text(concatStates(states, cities));
+  });
+
+  $('.locations .popover ul input.city').on('change', (e) => {
+    setChecked(e.target.checked, e.target.dataset, cities);
+    $('.locations h4').text(concatStates(states, cities));
+  });
   const setChecked = (checked, value = {}, amenityArray = {}) => {
     if (checked) {
       addItem(amenityArray, value);
@@ -26,6 +37,11 @@ $(document).ready(() => {
     amenityArray[value.name] = value.id;
   };
 
+  const concatStates = (states = {}, cities = {}) => {
+    const allData = Object.keys(states).concat(Object.keys(cities));
+    return allData.join(', ');
+  };
+
   /* get api status */
   try {
     $.get('http://0.0.0.0:5001/api/v1/status/', (data) => {
@@ -40,7 +56,6 @@ $(document).ready(() => {
   const placeXMLcallBack = (data) => {
     $('section.places').html(
       data.map((place) => {
-        console.log(place);
         return ` 
     <article>
       <div class="title_box">
@@ -79,9 +94,21 @@ $(document).ready(() => {
     success: placeXMLcallBack,
   });
 
+  const setQueryObj = (obj = {}) => {
+    if (Object.values(amenities).length) {
+      obj['amenities'] = Object.values(amenities);
+    }
+    if (Object.values(cities).length) {
+      obj['cities'] = Object.values(cities);
+    }
+    if (Object.values(states).length) {
+      obj['states'] = Object.values(states);
+    }
+  };
   /* get places according to amenities id */
   $('section.filters button').on('click', () => {
-    const obj = { amenities: Object.values(amenities) };
+    const obj = {};
+    setQueryObj(obj);
     $.ajax({
       url: 'http://0.0.0.0:5001/api/v1/places_search/',
       type: 'POST',
@@ -91,4 +118,49 @@ $(document).ready(() => {
       success: placeXMLcallBack,
     });
   });
+
+
+
+  /* SHOW AND HIDE REVIEWS WHEN span IS CLICKED */
+  /*Gets the the review span and div id */
+  const toggleReviewsBtn = $('#toggleReviewsButton');
+  const reviewsContainer = $('#reviewsContainer');
+
+  /* This function fetches and display the reviews */
+  function fetchAndDisplayReviews() {
+    $.ajax({
+      url: 'http://0.0.0.0:5001/api/v1/places_search/', //I'm confused on how i would get the reviews endpoint here. I didn't go through RESTful API
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        // Gets all reviews
+        const reviews = data.review;
+        reviewsContainer.html(reviews);
+      },
+      error: function(error) {
+        console.error('Error fetching reviews:', error);
+      }
+    });
+  }
+
+  // Helper function to hide the reviews
+  function hideReviews() {
+    reviewsContainer.html('');
+  }
+
+  // This fuunction is used to toggle the reviews visibility
+  function toggleReviews() {
+    if (toggleReviewsBtn.text() === 'show') {
+      toggleReviewsBtn.text('hide');
+      fetchAndDisplayReviews();
+    } else {
+      toggleReviewsBtn.text('show');
+      hideReviews();
+    }
+  }
+
+  // The event listener that listens to the click event on the "show/hide" span
+  toggleReviewsBtn.on('click', toggleReviews);
+
+  
 });
