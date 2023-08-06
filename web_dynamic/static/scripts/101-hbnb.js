@@ -133,8 +133,8 @@ $(document).ready(() => {
       method: 'GET',
       dataType: 'json',
       success: function(data) {
-        // Gets all review elements
-        const reviews = data.map(review => `<div class="review">${review.content}</div>`)
+        // Gets all reviews
+        const reviews = data.review;
         reviewsContainer.html(reviews);
       },
       error: function(error) {
