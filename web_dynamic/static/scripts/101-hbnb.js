@@ -129,7 +129,7 @@ $(document).ready(() => {
   /* This function fetches and display the reviews */
   function fetchAndDisplayReviews() {
     $.ajax({
-      url: 'your_reviews_endpoint', //I'm confused on how i would get the reviews endpoint here. I didn't go through RESTful API
+      url: 'http://0.0.0.0:5001/api/v1/places_search/', //I'm confused on how i would get the reviews endpoint here. I didn't go through RESTful API
       method: 'GET',
       dataType: 'json',
       success: function(data) {
@@ -164,38 +164,3 @@ $(document).ready(() => {
 
   
 });
-
-
-// $.ajax({
-//   url: 'http://0.0.0.0:5001/api/v1/places_search/', 
-//   method: 'GET',
-//   dataType: 'json',
-//   success: function(data) {
-//     // Gets all review elements
-//     const reviews = data.map(review => `<div class="review">${review.content}</div>`).join('');
-//     reviewsContainer.html(reviews);
-//   },
-//   error: function(error) {
-//     console.error('Error fetching reviews:', error);
-//   }
-// });
-// }
-// / Function to hide reviews
-// function hideReviews() {
-//   reviewsContainer.html('');
-// }
-
-// // Function to toggle the reviews visibility
-// function toggleReviews() {
-//   if (toggleReviewsBtn.text() === 'show') {
-//     toggleReviewsBtn.text('hide');
-//     fetchAndDisplayReviews();
-//   } else {
-//     toggleReviewsBtn.text('show');
-//     hideReviews();
-//   }
-// }
-
-// // Event listener for the click event on the "show/hide" span
-// toggleReviewsBtn.on('click', toggleReviews);
-// })
