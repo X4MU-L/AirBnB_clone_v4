@@ -134,7 +134,7 @@ $(document).ready(() => {
       dataType: 'json',
       success: function(data) {
         // Gets all review elements
-        const reviews = data.map(review => `<div class="review">${review.content}</div>`).join('');
+        const reviews = data.map(review => `<div class="review">${review.content}</div>`)
         reviewsContainer.html(reviews);
       },
       error: function(error) {
